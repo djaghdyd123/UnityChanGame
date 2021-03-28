@@ -1,0 +1,65 @@
+﻿<Properties StartupConfiguration="{90660CA0-6A7E-ECEA-1969-2FA643B7561F}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Script/Controller/MonsterController.cs">
+    <Files>
+      <File FileName="Assets/Script/UI/WorldSpace/UI_HpBar.cs" Line="1" Column="1" IsPinned="True" />
+      <File FileName="Assets/Script/Data/Data.Contents.cs" IsPinned="True" />
+      <File FileName="Assets/Script/Contents/PlayerStat.cs" />
+      <File FileName="Assets/Script/Controller/PlayerController.cs" />
+      <File FileName="Assets/Script/Managers/ResourceManager.cs" />
+      <File FileName="Assets/Script/Managers/PoolManager.cs" />
+      <File FileName="Assets/Script/Controller/MonsterController.cs" Line="69" Column="41" />
+      <File FileName="Assets/Script/UI/Popup/UI_Popup.cs" />
+      <File FileName="Assets/Script/Managers/InputManager.cs" />
+      <File FileName="Assets/Script/UI/Popup/UI_Button.cs" />
+      <File FileName="Assets/Script/UI/Scene/UI_Inven.cs" />
+      <File FileName="Assets/Script/UI/Scene/UI_Scene.cs" />
+      <File FileName="Assets/Script/UI/UI_Base.cs" />
+      <File FileName="Assets/Script/UI/UI_EventHandler.cs" />
+      <File FileName="Assets/Script/Scenes/BaseScene.cs" />
+      <File FileName="Assets/Script/Scenes/LoginScene.cs" />
+      <File FileName="Assets/Resources/Data/StatData.json" />
+      <File FileName="Assets/Script/Contents/Stat.cs" />
+      <File FileName="Assets/Script/Managers/DataManager.cs" />
+      <File FileName="Assets/Script/Managers/Contents/GameManagerEX.cs" />
+      <File FileName="Assets/Script/Contents/MonsterGenerator.cs" />
+      <File FileName="Assets/Script/Scenes/GameScene.cs" />
+      <File FileName="Assets/Script/Controller/BaseController.cs" />
+      <File FileName="Assets/Script/Utils/Define.cs" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="MyNewProject" expanded="True">
+            <Node name="Assets" expanded="True">
+              <Node name="Script" expanded="True">
+                <Node name="Contents" expanded="True" />
+                <Node name="Controller" expanded="True" />
+                <Node name="Data" expanded="True" />
+                <Node name="Managers" expanded="True">
+                  <Node name="Contents" expanded="True" />
+                </Node>
+                <Node name="Scenes" expanded="True" />
+                <Node name="UI" expanded="True">
+                  <Node name="Popup" expanded="True" />
+                  <Node name="Scene" expanded="True" />
+                  <Node name="SubItem" expanded="True" />
+                  <Node name="WorldSpace" expanded="True">
+                    <Node name="UI_HpBar.cs" selected="True" />
+                  </Node>
+                </Node>
+                <Node name="Utils" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="f780ab25-3e7c-4cf2-89a6-4eeec30c4389" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
