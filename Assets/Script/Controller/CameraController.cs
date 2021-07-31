@@ -34,7 +34,8 @@ public class CameraController : MonoBehaviour
             if(Physics.Raycast(_player.transform.position,_delta, out hit, _delta.magnitude,LayerMask.GetMask("Block")))
             {
                 float dist = (hit.point - _player.transform.position).magnitude * 0.8f;
-                transform.position = _player.transform.position + _delta.normalized * dist;
+                transform.position = _player.transform.position + _delta.normalized * dist + new Vector3(0.0f,1.0f,0.0f);
+                // TODO 카메라 각도도 조금 바꾸면 좋을것같다
 
             }
             else
@@ -44,7 +45,17 @@ public class CameraController : MonoBehaviour
             } 
             
         }
-        
+
+        if (_mode == Define.CameraMode.ShoulderView)
+        {
+            if (_player.IsValid() == false)
+                return;
+
+            // local 이므로 부모가 바라보는 방향이 축의 기준이됨.
+            transform.localPosition = _delta;
+            transform.localEulerAngles = new Vector3(15.0f, 0.0f, 0.0f);
+        }
+
     }
         
     // 외부에서 카메라 각도를 변경하고 싶을땧
@@ -52,6 +63,13 @@ public class CameraController : MonoBehaviour
     {
         _delta = delta;
         _mode = Define.CameraMode.QuarterView;
+    }
+
+    public void SetShoulderView()
+    {
+        gameObject.transform.SetParent(_player.transform);
+        _delta = new Vector3(0.0f, 2.0f, -2.0f);
+        _mode = Define.CameraMode.ShoulderView;
     }
 }
 

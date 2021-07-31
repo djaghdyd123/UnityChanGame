@@ -155,6 +155,7 @@ public class PlayerController : BaseController
   
     void OnKeyboard()
     {
+        
         if (Input.GetKey(KeyCode.W))
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
