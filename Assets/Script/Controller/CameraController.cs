@@ -70,6 +70,7 @@ public class CameraController : MonoBehaviour
         gameObject.transform.SetParent(_player.transform);
         _delta = new Vector3(0.0f, 2.0f, -2.0f);
         _mode = Define.CameraMode.ShoulderView;
+        _player.GetOrAddComponent<PlayerController>().Mode = Define.CameraMode.ShoulderView;
     }
 }
 

@@ -6,11 +6,19 @@ using UnityEngine.AI;
 public class PlayerController : BaseController
 {
 
-    PlayerStat _stat;
-
+    protected PlayerStat _stat;
 
     int _mask = (1 << (int)Define.layer.Monster | (1 << (int)Define.layer.Ground));
 
+    Define.CameraMode _cameraMode = Define.CameraMode.QuarterView;
+    public Define.CameraMode Mode
+    {
+        get { return _cameraMode; }
+        set
+        {
+            _cameraMode = value;
+        }
+    }
     public override void Init()
     {
         WorldObject = Define.WorldObject.Player;
@@ -26,6 +34,47 @@ public class PlayerController : BaseController
 
     }
 
+    public override Define.State State
+    {
+        get { return _state; }
+        set
+        {
+            _state = value;
+            Animator _anim = gameObject.GetComponent<Animator>();
+
+            switch (_state)
+            {
+                case Define.State.Idle:
+                    _anim.CrossFade("WAIT", 0.1f);
+                    break;
+
+                case Define.State.Die:
+                    break;
+                case Define.State.Attack:
+                    _anim.CrossFade("ATTACK", 0.1f);
+                    break;
+                case Define.State.Jump:
+                    _anim.CrossFade("JUMP", 0.1f);
+                    break;
+                case Define.State.Run:
+                    _anim.CrossFade("RUN", 0.1f);
+                    _stat.MoveSpeed = 5.0f;
+                    break;
+                case Define.State.Run_B:
+                    _anim.CrossFade("WALK00_B", 0.1f);
+                    _stat.MoveSpeed = 2.0f;
+                    break;
+                case Define.State.Run_L:
+                    _anim.CrossFade("WALK00_L", 0.1f);
+                    _stat.MoveSpeed = 2.0f;
+                    break;
+                case Define.State.Run_R:
+                    _anim.CrossFade("WALK00_R", 0.1f);
+                    _stat.MoveSpeed = 2.0f;
+                    break;
+            }
+        }
+    }
 
     #region
     //GameObject (plaer)
@@ -66,8 +115,8 @@ public class PlayerController : BaseController
             }
 
             //방향을 먼저 구하자
-            dir = _destPos - transform.position;
-            dir.y = 0;
+                dir = _destPos - transform.position;
+                dir.y = 0;
             //오차 범위 허용
             if (dir.magnitude < 0.1f)
             {
@@ -75,17 +124,22 @@ public class PlayerController : BaseController
             }
             else
             {
+
                 if (Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1.0f, LayerMask.GetMask("Block")))
                 {
+                    // 장애물 맞닥뜨릴때 더이상 transform x  마우스 때기전까지 계속 이동모션
                     if (Input.GetMouseButton(0) == false)
                         State = Define.State.Idle;
                     return;
                 }
                 float _moveDist = Mathf.Clamp(Time.deltaTime * _stat.MoveSpeed, 0, dir.magnitude);
                 transform.position += dir.normalized * _moveDist;
+                // 좌우뒤 이동은 방향 변환 x
+                if(State == Define.State.Run)
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
-
             }
+        
+           
  
     }
     private void OnCollisionEnter(Collision collision)
@@ -155,32 +209,84 @@ public class PlayerController : BaseController
   
     void OnKeyboard()
     {
-        
-        if (Input.GetKey(KeyCode.W))
+        switch (Mode)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
-            transform.position += Vector3.forward * Time.deltaTime * _stat.MoveSpeed;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.2f);
-            transform.position += Vector3.back * Time.deltaTime * _stat.MoveSpeed;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.2f);
-            transform.position += Vector3.left * Time.deltaTime * _stat.MoveSpeed;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
-            transform.position += Vector3.right * Time.deltaTime * _stat.MoveSpeed;
-        }
+            case Define.CameraMode.QuarterView:
+                if (Input.GetKey(KeyCode.W))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
+                    transform.position += Vector3.forward * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.2f);
+                    transform.position += Vector3.back * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKey(KeyCode.A))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.2f);
+                    transform.position += Vector3.left * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKey(KeyCode.D))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
+                    transform.position += Vector3.right * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+                {
+                    State = Define.State.Idle;
+                }
+                break;
 
-        if(Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S )|| Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
-        {
-            State = Define.State.Idle;
+            case Define.CameraMode.ShoulderView:
+                if (Input.GetKey(KeyCode.W))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + transform.forward;
+                    Debug.Log(transform.forward);
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    if (_state != Define.State.Run_B)
+                    {
+                        State = Define.State.Run_B;
+                    }
+                    _destPos = transform.position - transform.forward;
+                }
+                if (Input.GetKey(KeyCode.A))
+                {
+                    if (_state != Define.State.Run_L)
+                    {
+                        State = Define.State.Run_L;
+                    }
+                    Vector3 v = transform.forward;
+
+                    var ca = Mathf.Cos(90);
+                    var sa = Mathf.Sin(90);
+                    Vector3 left = new Vector3(ca * v.x - sa * v.z, v.y, sa * v.x + ca * v.z);
+                    _destPos = transform.position + left;
+
+
+
+                }
+                if (Input.GetKey(KeyCode.D))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
+                    transform.position += Vector3.right * Time.deltaTime * _stat.MoveSpeed;
+                }
+
+                if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+                {
+                    //destPos 
+                    State = Define.State.Idle;
+                }
+                break;
+               
         }
+       
     }
 
     bool _stopSkill = false;
