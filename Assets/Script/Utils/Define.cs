@@ -53,7 +53,8 @@ public class Define
         PointerUp,
         Clicked,
         Pressed,
-        PointerDownRight
+        PointerDownRight,
+        PressedRight,
     }
 
     public enum CameraMode

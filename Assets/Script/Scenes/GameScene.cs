@@ -8,7 +8,7 @@ public class GameScene : BaseScene
     {
         base.Init();
 
-        Managers.UI.ShowPopupUI<UI_Button>();
+        //Managers.UI.ShowPopupUI<UI_Button>();
         SceneType = Define.Scene.Game;
 
         Dictionary<int,Data.Stat> dict = Managers.Data.StatDict;

@@ -13,11 +13,14 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     GameObject _player = null;
 
+
     public void SetPlayer(GameObject player) { _player = player; }
 
     void Start()
     {
-        
+        Managers.Input.MousAction -= OnMouseDrag;
+        Managers.Input.MousAction += OnMouseDrag;
+
     }
 
     // Key 이동 업데이트가 우선 시행되고 카메라가 따라가는 방식으로해야 카메라의 이동이 자연스럽다.
@@ -39,7 +42,7 @@ public class CameraController : MonoBehaviour
 
             }
             else
-            {
+            { 
                 transform.position = _player.transform.position + _delta;
                 transform.LookAt(_player.transform);
             } 
@@ -50,11 +53,13 @@ public class CameraController : MonoBehaviour
         {
             if (_player.IsValid() == false)
                 return;
-
+            
             // local 이므로 부모가 바라보는 방향이 축의 기준이됨.
             transform.localPosition = _delta;
             transform.localEulerAngles = new Vector3(15.0f, 0.0f, 0.0f);
+
         }
+        
 
     }
         
@@ -71,6 +76,20 @@ public class CameraController : MonoBehaviour
         _delta = new Vector3(0.0f, 2.0f, -2.0f);
         _mode = Define.CameraMode.ShoulderView;
         _player.GetOrAddComponent<PlayerController>().Mode = Define.CameraMode.ShoulderView;
+    }
+
+
+    public void OnMouseDrag(Define.MousEvent evt)
+    {
+        switch(evt)
+        {
+            case Define.MousEvent.PressedRight:
+                Vector3 dir = _player.transform.position - transform.position;
+                Debug.Log(Input.GetAxis("Mouse X"));
+
+                break;
+        }
+            
     }
 }
 

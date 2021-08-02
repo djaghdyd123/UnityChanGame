@@ -29,8 +29,11 @@ public class PlayerController : BaseController
         Managers.Input.MousAction -= OnMouseEvent;
         Managers.Input.MousAction += OnMouseEvent;
 
-        if(gameObject.GetComponentInChildren<UI_HpBar>() == null)
-        Managers.UI.MakeWordSpaceUI<UI_HpBar>(transform); 
+
+
+        // HP bar
+        //if(gameObject.GetComponentInChildren<UI_HpBar>() == null)
+        //Managers.UI.MakeWordSpaceUI<UI_HpBar>(transform); 
 
     }
 
@@ -136,7 +139,7 @@ public class PlayerController : BaseController
                 transform.position += dir.normalized * _moveDist;
                 // 좌우뒤 이동은 방향 변환 x
                 if(State == Define.State.Run)
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 10 * Time.deltaTime);
             }
         
            
@@ -264,18 +267,20 @@ public class PlayerController : BaseController
                     }
                     Vector3 v = transform.forward;
 
-                    var ca = Mathf.Cos(90);
-                    var sa = Mathf.Sin(90);
-                    Vector3 left = new Vector3(ca * v.x - sa * v.z, v.y, sa * v.x + ca * v.z);
-                    _destPos = transform.position + left;
-
+                    _destPos = transform.position + rotateVector(transform.forward, 90);
 
 
                 }
                 if (Input.GetKey(KeyCode.D))
                 {
-                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
-                    transform.position += Vector3.right * Time.deltaTime * _stat.MoveSpeed;
+                    if (_state != Define.State.Run_R)
+                    {
+                        State = Define.State.Run_R;
+                    }
+                    Vector3 v = transform.forward;
+
+                    _destPos = transform.position + rotateVector(transform.forward, 270);
+
                 }
 
                 if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
@@ -286,9 +291,17 @@ public class PlayerController : BaseController
                 break;
                
         }
-       
+        
     }
 
+    Vector3 rotateVector(Vector3 vect, float deg)
+    {
+        float rad = Mathf.Deg2Rad*deg;
+        float cos = Mathf.Cos(rad);
+        float sin = Mathf.Sin(rad);
+        Vector3 newVector = new Vector3(vect.x * cos - vect.z * sin, vect.y, vect.z * cos + vect.x * sin);
+        return newVector;
+    }
     bool _stopSkill = false;
 
     void OnMouseEvent(Define.MousEvent evt)
@@ -310,42 +323,26 @@ public class PlayerController : BaseController
         }
     }
 
+
     void onMouseEvent_IdleRun(Define.MousEvent evt)
     {
-        #region
-        /*
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 MousPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
-            Vector3 dir = MousPos - Camera.main.transform.position;
-
-            dir = dir.normalized;
-
-            Debug.DrawRay(Camera.main.transform.position, dir * 100.0f, Color.red , 1.0f);
-
-            RaycastHit hit;
-
-            if (Physics.Raycast(Camera.main.transform.position, dir, out hit, 100.0f))
-            {
-                Debug.Log($"RayCast {hit.collider.gameObject.name}!");
-            }
-        }
-        */
-        #endregion
-
+            
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
+            
 
         bool raycastHit = Physics.Raycast(ray, out hit, 100.0f, _mask);
         Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
-
+        
         switch (evt)
         {
             case Define.MousEvent.PointerDown:
+                switch (_cameraMode)
                 {
-                    if (raycastHit)
+                    case Define.CameraMode.QuarterView:
+                        if (raycastHit)
                     {
-                       
+
                         _destPos = hit.point;
                         _destPos.y = 0;
                         State = Define.State.Run;
@@ -359,15 +356,47 @@ public class PlayerController : BaseController
                             _lockTarget = null;
                         }
                     }
+                        break;
+                    case Define.CameraMode.ShoulderView:
+                            break;
                 }
                 break;
-
             case Define.MousEvent.Pressed:
+                    
+                switch (_cameraMode)
                 {
+                    case Define.CameraMode.QuarterView:
                     if (_lockTarget == null && raycastHit) _destPos = hit.point;
-                }
+                        break;
+                    case Define.CameraMode.ShoulderView:
+                        break;
+                }         
                 break;
             case Define.MousEvent.Clicked:
+                switch (_cameraMode)
+            {
+                case Define.CameraMode.QuarterView:
+                       
+                    break;
+                case Define.CameraMode.ShoulderView:
+                    if (raycastHit)
+                    {
+
+                        _destPos = hit.point;
+                        _destPos.y = 0;
+                        State = Define.State.Run;
+                        _stopSkill = false;
+                        if (hit.collider.gameObject.layer == (int)Define.layer.Monster)
+                        {
+                            _lockTarget = hit.collider.gameObject;
+                        }
+                        else if (hit.collider.gameObject.layer == (int)Define.layer.Ground)
+                        {
+                            _lockTarget = null;
+                        }
+                    }
+                    break;
+            }
                 break;
             case Define.MousEvent.PointerUp:
                 _stopSkill = true;
@@ -377,6 +406,6 @@ public class PlayerController : BaseController
                 _isJumping = true;
                 break;
         }
-
+            //lastTick = currentTick;
     }
 }
