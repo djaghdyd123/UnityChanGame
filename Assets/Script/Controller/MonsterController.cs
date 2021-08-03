@@ -69,6 +69,7 @@ public class MonsterController : BaseController
             nav.speed = _stat.MoveSpeed;
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
         }
+        
     }
     protected override void Skill()
     {

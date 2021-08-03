@@ -54,6 +54,7 @@ public class Define
         Clicked,
         Pressed,
         PointerDownRight,
+        PointerUpRight,
         PressedRight,
     }
 

@@ -61,7 +61,7 @@ public class InputManager
             {
                 if(_pressedRight)
                 {
-                   
+                    MousAction.Invoke(Define.MousEvent.PointerUpRight);
                 }
                 _pressedRight = false;
             }

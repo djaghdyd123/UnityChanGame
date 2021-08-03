@@ -13,6 +13,7 @@ public class CameraController : MonoBehaviour
     [SerializeField]
     GameObject _player = null;
 
+    bool _pressed = false;
 
     public void SetPlayer(GameObject player) { _player = player; }
 
@@ -53,13 +54,16 @@ public class CameraController : MonoBehaviour
         {
             if (_player.IsValid() == false)
                 return;
-            
+
             // local 이므로 부모가 바라보는 방향이 축의 기준이됨.
             transform.localPosition = _delta;
-            transform.localEulerAngles = new Vector3(15.0f, 0.0f, 0.0f);
 
+            // 드래그 풀면 천천히 카메라가 디폴드값이 됨.
+            if(!_pressed)
+            _delta = Vector3.Slerp(_delta, new Vector3(0.0f, 2.0f, -2.5f), 0.1f);
+            Vector3 dir = _player.transform.position - transform.position;
+            transform.rotation = Quaternion.LookRotation(dir + new Vector3(0,1.5f,0));
         }
-        
 
     }
         
@@ -73,7 +77,7 @@ public class CameraController : MonoBehaviour
     public void SetShoulderView()
     {
         gameObject.transform.SetParent(_player.transform);
-        _delta = new Vector3(0.0f, 2.0f, -2.0f);
+        _delta = new Vector3(0.0f, 2.0f, -2.5f);
         _mode = Define.CameraMode.ShoulderView;
         _player.GetOrAddComponent<PlayerController>().Mode = Define.CameraMode.ShoulderView;
     }
@@ -84,12 +88,15 @@ public class CameraController : MonoBehaviour
         switch(evt)
         {
             case Define.MousEvent.PressedRight:
-                Vector3 dir = _player.transform.position - transform.position;
-                Debug.Log(Input.GetAxis("Mouse X"));
-
+                _pressed = true;
+                _delta = Utils.RotateYAxis(_delta, Input.GetAxis("Mouse X") * Mathf.Rad2Deg / 3);
+                break;
+            case Define.MousEvent.PointerUpRight:
+                _pressed = false;
                 break;
         }
             
     }
+
 }
 

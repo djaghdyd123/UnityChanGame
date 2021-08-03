@@ -139,7 +139,7 @@ public class PlayerController : BaseController
                 transform.position += dir.normalized * _moveDist;
                 // 좌우뒤 이동은 방향 변환 x
                 if(State == Define.State.Run)
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 10 * Time.deltaTime);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 3.5f * Time.deltaTime);
             }
         
            
@@ -185,7 +185,6 @@ public class PlayerController : BaseController
     }
     void OnLand()
     {
-        Debug.Log("Land!");
         
     }
     void OnHitEvent()
@@ -242,16 +241,35 @@ public class PlayerController : BaseController
                 break;
 
             case Define.CameraMode.ShoulderView:
-                if (Input.GetKey(KeyCode.W))
+
+                if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 45);
+
+                }
+                else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 315);
+
+                }
+                else if (Input.GetKey(KeyCode.W))
                 {
                     if (_state != Define.State.Run)
                     {
                         State = Define.State.Run;
                     }
                     _destPos = transform.position + transform.forward;
-                    Debug.Log(transform.forward);
+
                 }
-                if (Input.GetKey(KeyCode.S))
+                else if (Input.GetKey(KeyCode.S))
                 {
                     if (_state != Define.State.Run_B)
                     {
@@ -259,7 +277,7 @@ public class PlayerController : BaseController
                     }
                     _destPos = transform.position - transform.forward;
                 }
-                if (Input.GetKey(KeyCode.A))
+                else if (Input.GetKey(KeyCode.A))
                 {
                     if (_state != Define.State.Run_L)
                     {
@@ -268,10 +286,8 @@ public class PlayerController : BaseController
                     Vector3 v = transform.forward;
 
                     _destPos = transform.position + rotateVector(transform.forward, 90);
-
-
                 }
-                if (Input.GetKey(KeyCode.D))
+                else if (Input.GetKey(KeyCode.D))
                 {
                     if (_state != Define.State.Run_R)
                     {
@@ -282,8 +298,16 @@ public class PlayerController : BaseController
                     _destPos = transform.position + rotateVector(transform.forward, 270);
 
                 }
+                else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 45);
 
-                if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+                }
+                else if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
                 {
                     //destPos 
                     State = Define.State.Idle;

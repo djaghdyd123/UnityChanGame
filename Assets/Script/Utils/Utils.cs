@@ -48,7 +48,15 @@ public class Utils
             }
         }
 
-
         return null;
+    }
+
+    public static Vector3 RotateYAxis(Vector3 vect, float degree)
+    {
+        float rad = Mathf.Deg2Rad * degree;
+        float cos = Mathf.Cos(rad);
+        float sin = Mathf.Sin(rad);
+        Vector3 newVector = new Vector3(vect.x * cos - vect.z * sin, vect.y, vect.z * cos + vect.x * sin);
+        return newVector;
     }
 } 
