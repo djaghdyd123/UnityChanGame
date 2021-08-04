@@ -3106,8 +3106,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mode: 0
-  _delta: {x: 0, y: 9, z: -8}
+  _deltaPos: {x: 0, y: 0, z: 0}
   _player: {fileID: 0}
+  DEGREE_RANGE: 40
 --- !u!1001 &585785760
 PrefabInstance:
   m_ObjectHideFlags: 0
