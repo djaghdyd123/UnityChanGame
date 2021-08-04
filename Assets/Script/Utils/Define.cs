@@ -16,6 +16,9 @@ public class Define
         Die,
         Idle,
         Run,
+        Run_B,
+        Run_R,
+        Run_L,
         Attack,
         Jump
     }
@@ -50,11 +53,21 @@ public class Define
         PointerUp,
         Clicked,
         Pressed,
-        PointerDownRight
+        PointerDownRight,
+        PointerUpRight,
+        PressedRight,
     }
 
     public enum CameraMode
     {
         QuarterView,
+        ShoulderView,
+
+    }
+
+    public enum GameMode
+    {
+        QuaterView,
+        ShoudlerView,
     }
 }

@@ -9,7 +9,9 @@ public class InputManager
     public Action KeyAction;
     public Action<Define.MousEvent> MousAction;
 
+
     bool _pressed = false;
+    bool _pressedRight = false;
     float _pressedTime = 0;
 
     public void OnUpdate()
@@ -32,7 +34,7 @@ public class InputManager
                 MousAction.Invoke(Define.MousEvent.Pressed);
                 _pressed = true;
             }
-            else
+            else // 때는 순간 클릭인지 아닌지 판단.
             {
                 if (_pressed)
                 {
@@ -44,7 +46,25 @@ public class InputManager
                 _pressed = false;
                 _pressedTime = 0;
             }
-            if (Input.GetMouseButtonDown(1)) MousAction.Invoke(Define.MousEvent.PointerDownRight);
+
+            if (Input.GetMouseButton(1))
+            {
+                if (_pressedRight == false)
+                {
+                    // 우클릭 한번 했을때.
+                }
+                    
+                MousAction.Invoke(Define.MousEvent.PressedRight);
+                _pressedRight = true;
+            }
+            else
+            {
+                if(_pressedRight)
+                {
+                    MousAction.Invoke(Define.MousEvent.PointerUpRight);
+                }
+                _pressedRight = false;
+            }
         }
        
     }

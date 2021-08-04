@@ -6,11 +6,19 @@ using UnityEngine.AI;
 public class PlayerController : BaseController
 {
 
-    PlayerStat _stat;
-
+    protected PlayerStat _stat;
 
     int _mask = (1 << (int)Define.layer.Monster | (1 << (int)Define.layer.Ground));
 
+    Define.CameraMode _cameraMode = Define.CameraMode.QuarterView;
+    public Define.CameraMode Mode
+    {
+        get { return _cameraMode; }
+        set
+        {
+            _cameraMode = value;
+        }
+    }
     public override void Init()
     {
         WorldObject = Define.WorldObject.Player;
@@ -21,11 +29,55 @@ public class PlayerController : BaseController
         Managers.Input.MousAction -= OnMouseEvent;
         Managers.Input.MousAction += OnMouseEvent;
 
-        if(gameObject.GetComponentInChildren<UI_HpBar>() == null)
-        Managers.UI.MakeWordSpaceUI<UI_HpBar>(transform); 
+
+
+        // HP bar
+        //if(gameObject.GetComponentInChildren<UI_HpBar>() == null)
+        //Managers.UI.MakeWordSpaceUI<UI_HpBar>(transform); 
 
     }
 
+    public override Define.State State
+    {
+        get { return _state; }
+        set
+        {
+            _state = value;
+            Animator _anim = gameObject.GetComponent<Animator>();
+
+            switch (_state)
+            {
+                case Define.State.Idle:
+                    _anim.CrossFade("WAIT", 0.1f);
+                    break;
+
+                case Define.State.Die:
+                    break;
+                case Define.State.Attack:
+                    _anim.CrossFade("ATTACK", 0.1f);
+                    break;
+                case Define.State.Jump:
+                    _anim.CrossFade("JUMP", 0.1f);
+                    break;
+                case Define.State.Run:
+                    _anim.CrossFade("RUN", 0.1f);
+                    _stat.MoveSpeed = 5.0f;
+                    break;
+                case Define.State.Run_B:
+                    _anim.CrossFade("WALK00_B", 0.1f);
+                    _stat.MoveSpeed = 2.0f;
+                    break;
+                case Define.State.Run_L:
+                    _anim.CrossFade("WALK00_L", 0.1f);
+                    _stat.MoveSpeed = 2.0f;
+                    break;
+                case Define.State.Run_R:
+                    _anim.CrossFade("WALK00_R", 0.1f);
+                    _stat.MoveSpeed = 2.0f;
+                    break;
+            }
+        }
+    }
 
     #region
     //GameObject (plaer)
@@ -66,8 +118,8 @@ public class PlayerController : BaseController
             }
 
             //방향을 먼저 구하자
-            dir = _destPos - transform.position;
-            dir.y = 0;
+                dir = _destPos - transform.position;
+                dir.y = 0;
             //오차 범위 허용
             if (dir.magnitude < 0.1f)
             {
@@ -75,17 +127,22 @@ public class PlayerController : BaseController
             }
             else
             {
+
                 if (Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1.0f, LayerMask.GetMask("Block")))
                 {
+                    // 장애물 맞닥뜨릴때 더이상 transform x  마우스 때기전까지 계속 이동모션
                     if (Input.GetMouseButton(0) == false)
                         State = Define.State.Idle;
                     return;
                 }
                 float _moveDist = Mathf.Clamp(Time.deltaTime * _stat.MoveSpeed, 0, dir.magnitude);
                 transform.position += dir.normalized * _moveDist;
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 20 * Time.deltaTime);
-
+                // 좌우뒤 이동은 방향 변환 x
+                if(State == Define.State.Run)
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 3.5f * Time.deltaTime);
             }
+        
+           
  
     }
     private void OnCollisionEnter(Collision collision)
@@ -128,7 +185,6 @@ public class PlayerController : BaseController
     }
     void OnLand()
     {
-        Debug.Log("Land!");
         
     }
     void OnHitEvent()
@@ -155,33 +211,121 @@ public class PlayerController : BaseController
   
     void OnKeyboard()
     {
-        if (Input.GetKey(KeyCode.W))
+        switch (Mode)
         {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
-            transform.position += Vector3.forward * Time.deltaTime * _stat.MoveSpeed;
-        }
-        if (Input.GetKey(KeyCode.S))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.2f);
-            transform.position += Vector3.back * Time.deltaTime * _stat.MoveSpeed;
-        }
-        if (Input.GetKey(KeyCode.A))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.2f);
-            transform.position += Vector3.left * Time.deltaTime * _stat.MoveSpeed;
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
-            transform.position += Vector3.right * Time.deltaTime * _stat.MoveSpeed;
-        }
+            case Define.CameraMode.QuarterView:
+                if (Input.GetKey(KeyCode.W))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward), 0.2f);
+                    transform.position += Vector3.forward * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKey(KeyCode.S))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.back), 0.2f);
+                    transform.position += Vector3.back * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKey(KeyCode.A))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), 0.2f);
+                    transform.position += Vector3.left * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKey(KeyCode.D))
+                {
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.right), 0.2f);
+                    transform.position += Vector3.right * Time.deltaTime * _stat.MoveSpeed;
+                }
+                if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+                {
+                    State = Define.State.Idle;
+                }
+                break;
 
-        if(Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S )|| Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
-        {
-            State = Define.State.Idle;
+            case Define.CameraMode.ShoulderView:
+
+                if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 45);
+
+                }
+                else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 315);
+
+                }
+                else if (Input.GetKey(KeyCode.W))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + transform.forward;
+
+                }
+                else if (Input.GetKey(KeyCode.S))
+                {
+                    if (_state != Define.State.Run_B)
+                    {
+                        State = Define.State.Run_B;
+                    }
+                    _destPos = transform.position - transform.forward;
+                }
+                else if (Input.GetKey(KeyCode.A))
+                {
+                    if (_state != Define.State.Run_L)
+                    {
+                        State = Define.State.Run_L;
+                    }
+                    Vector3 v = transform.forward;
+
+                    _destPos = transform.position + rotateVector(transform.forward, 90);
+                }
+                else if (Input.GetKey(KeyCode.D))
+                {
+                    if (_state != Define.State.Run_R)
+                    {
+                        State = Define.State.Run_R;
+                    }
+                    Vector3 v = transform.forward;
+
+                    _destPos = transform.position + rotateVector(transform.forward, 270);
+
+                }
+                else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
+                {
+                    if (_state != Define.State.Run)
+                    {
+                        State = Define.State.Run;
+                    }
+                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 45);
+
+                }
+                else if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
+                {
+                    //destPos 
+                    State = Define.State.Idle;
+                }
+                break;
+               
         }
+        
     }
 
+    Vector3 rotateVector(Vector3 vect, float deg)
+    {
+        float rad = Mathf.Deg2Rad*deg;
+        float cos = Mathf.Cos(rad);
+        float sin = Mathf.Sin(rad);
+        Vector3 newVector = new Vector3(vect.x * cos - vect.z * sin, vect.y, vect.z * cos + vect.x * sin);
+        return newVector;
+    }
     bool _stopSkill = false;
 
     void OnMouseEvent(Define.MousEvent evt)
@@ -203,42 +347,26 @@ public class PlayerController : BaseController
         }
     }
 
+
     void onMouseEvent_IdleRun(Define.MousEvent evt)
     {
-        #region
-        /*
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector3 MousPos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Camera.main.nearClipPlane));
-            Vector3 dir = MousPos - Camera.main.transform.position;
-
-            dir = dir.normalized;
-
-            Debug.DrawRay(Camera.main.transform.position, dir * 100.0f, Color.red , 1.0f);
-
-            RaycastHit hit;
-
-            if (Physics.Raycast(Camera.main.transform.position, dir, out hit, 100.0f))
-            {
-                Debug.Log($"RayCast {hit.collider.gameObject.name}!");
-            }
-        }
-        */
-        #endregion
-
+            
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
+            
 
         bool raycastHit = Physics.Raycast(ray, out hit, 100.0f, _mask);
         Debug.DrawRay(Camera.main.transform.position, ray.direction * 100.0f, Color.red, 1.0f);
-
+        
         switch (evt)
         {
             case Define.MousEvent.PointerDown:
+                switch (_cameraMode)
                 {
-                    if (raycastHit)
+                    case Define.CameraMode.QuarterView:
+                        if (raycastHit)
                     {
-                       
+
                         _destPos = hit.point;
                         _destPos.y = 0;
                         State = Define.State.Run;
@@ -252,15 +380,47 @@ public class PlayerController : BaseController
                             _lockTarget = null;
                         }
                     }
+                        break;
+                    case Define.CameraMode.ShoulderView:
+                            break;
                 }
                 break;
-
             case Define.MousEvent.Pressed:
+                    
+                switch (_cameraMode)
                 {
+                    case Define.CameraMode.QuarterView:
                     if (_lockTarget == null && raycastHit) _destPos = hit.point;
-                }
+                        break;
+                    case Define.CameraMode.ShoulderView:
+                        break;
+                }         
                 break;
             case Define.MousEvent.Clicked:
+                switch (_cameraMode)
+            {
+                case Define.CameraMode.QuarterView:
+                       
+                    break;
+                case Define.CameraMode.ShoulderView:
+                    if (raycastHit)
+                    {
+
+                        _destPos = hit.point;
+                        _destPos.y = 0;
+                        State = Define.State.Run;
+                        _stopSkill = false;
+                        if (hit.collider.gameObject.layer == (int)Define.layer.Monster)
+                        {
+                            _lockTarget = hit.collider.gameObject;
+                        }
+                        else if (hit.collider.gameObject.layer == (int)Define.layer.Ground)
+                        {
+                            _lockTarget = null;
+                        }
+                    }
+                    break;
+            }
                 break;
             case Define.MousEvent.PointerUp:
                 _stopSkill = true;
@@ -270,6 +430,6 @@ public class PlayerController : BaseController
                 _isJumping = true;
                 break;
         }
-
+            //lastTick = currentTick;
     }
 }
