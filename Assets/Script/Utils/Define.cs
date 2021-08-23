@@ -19,6 +19,8 @@ public class Define
         Run_B,
         Run_R,
         Run_L,
+        Run_FL,
+        Run_FR,
         Attack,
         Jump
     }
@@ -34,6 +36,7 @@ public class Define
         Login,
         Lobby,
         Game,
+        Game2,
     }
     public enum Sound
     {
@@ -62,6 +65,7 @@ public class Define
     {
         QuarterView,
         ShoulderView,
+        ShoulderView2,
 
     }
 
@@ -69,5 +73,6 @@ public class Define
     {
         QuaterView,
         ShoudlerView,
+        
     }
 }

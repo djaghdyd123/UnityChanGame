@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour
     float _deltaDegree;
 
     public void SetPlayer(GameObject player) { _player = player; }
-
+    public Vector3 DeltaPos { get { return _deltaPos; } set { _deltaPos = value; } }
     void Start()
     {
         Managers.Input.MousAction -= OnMouseDrag;
@@ -54,7 +54,6 @@ public class CameraController : MonoBehaviour
                 transform.position = _player.transform.position + _deltaPos;
                 transform.LookAt(_player.transform);
             } 
-            
         }
 
         if (_mode == Define.CameraMode.ShoulderView)
@@ -62,8 +61,19 @@ public class CameraController : MonoBehaviour
             if (_player.IsValid() == false)
                 return;
 
-            // local 이므로 부모가 바라보는 방향이 축의 기준이됨.
-            transform.localPosition = _deltaPos + new Vector3(0.0f, 2.0f, 0);
+            RaycastHit hit;
+            Vector3 dir1 =  transform.position - _player.transform.position;
+  
+            if (Physics.Raycast(_player.transform.position, dir1.normalized, out hit, 3.0f, LayerMask.GetMask("Block")))
+            {
+                float dist = (hit.point - _player.transform.position).magnitude * 0.8f;
+                transform.localPosition = _deltaPos.normalized * dist + new Vector3(0.0f, 1.0f, 0.0f);
+            }
+            else
+            {
+                // local 이므로 부모가 바라보는 방향이 축의 기준이됨.
+                transform.localPosition = _deltaPos + new Vector3(0.0f, 2.0f, 0);
+            }
 
             // 드래그 풀면 천천히 카메라가 디폴드값이 됨.
             if (!_pressed)
@@ -71,9 +81,19 @@ public class CameraController : MonoBehaviour
                 _deltaPos = Vector3.Slerp(_deltaPos, new Vector3(0.0f, 0, -2.5f), 0.1f);
                 _currentDegree = 0.0f;
             }
-            
+
             Vector3 dir = _player.transform.position - transform.position;
-            transform.rotation = Quaternion.LookRotation(dir + new Vector3(0,1.5f,0));
+            transform.rotation = Quaternion.LookRotation(dir + new Vector3(0, 1.5f, 0));
+        }
+
+
+        if (_mode == Define.CameraMode.ShoulderView2)
+        {
+            if (_player.IsValid() == false)
+                return;
+            transform.localPosition = _deltaPos+ new Vector3(0.0f, 1.5f,0);
+            transform.LookAt(_player.transform.position+new Vector3(0,1.5f,0));
+
         }
 
     }
@@ -91,8 +111,15 @@ public class CameraController : MonoBehaviour
         _deltaPos = new Vector3(0.0f,0, -2.5f);
         _mode = Define.CameraMode.ShoulderView;
         _player.GetOrAddComponent<PlayerController>().Mode = Define.CameraMode.ShoulderView;
+        _player.GetOrAddComponent<PlayerController>().cam = gameObject;
     }
 
+    public void SetShoulderView2()
+    {
+        gameObject.transform.SetParent(Utils.FindChild(_player, "RotationXAxis", true).transform);
+        _deltaPos = new Vector3(0.0f, 0, -1.5f);
+        _mode = Define.CameraMode.ShoulderView2;
+    }
 
     public void OnMouseDrag(Define.MousEvent evt)
     {
@@ -113,9 +140,10 @@ public class CameraController : MonoBehaviour
     void onDragMove()
     {
         // Y축 회전
-        _deltaPos = Utils.RotateYAxis(_deltaPos, Input.GetAxis("Mouse X") * Mathf.Rad2Deg / 3);
-        // for vertical movement of Cam
 
+        _deltaPos = Utils.RotateYAxis(_deltaPos, -Input.GetAxis("Mouse X") * Mathf.Rad2Deg / 3);
+        // for vertical movement of Cam
+        
         // xz plane에 있는 벡[SerializeField]
            _arbitraryAxis = Utils.RotateYAxis(new Vector3(_deltaPos.x,0,_deltaPos.z), 90);
 
@@ -125,37 +153,29 @@ public class CameraController : MonoBehaviour
             //위를 바라볼때 최대 변화량 제한
             if (_currentDegree > 0)
             {
-                _deltaDegree = Mathf.Clamp(-Input.GetAxis("Mouse Y") * Mathf.Rad2Deg / 3, -99, DEGREE_RANGE - _currentDegree);
+                _deltaDegree = Mathf.Clamp(-Input.GetAxis("Mouse Y") * Mathf.Rad2Deg / 3, -20, DEGREE_RANGE - _currentDegree);
             }
             // 아래를 바라볼때 최대 변화량 제한
             else if (_currentDegree <= 0)
             {
-                _deltaDegree = Mathf.Clamp(-Input.GetAxis("Mouse Y") * Mathf.Rad2Deg / 3, -_currentDegree - DEGREE_RANGE, 99);
+                _deltaDegree = Mathf.Clamp(-Input.GetAxis("Mouse Y") * Mathf.Rad2Deg / 3, -_currentDegree - DEGREE_RANGE, 20);
             }
             _currentDegree += _deltaDegree;
-
             //X-Z 축 회
+
             Quaternion rotation = Quaternion.AngleAxis(_deltaDegree, _arbitraryAxis.normalized);
             _deltaPos = rotation * _deltaPos;
+
         }
+    }
 
-        //강제보정
-        //else if (_currentDegree >= DEGREE_RANGE)
-        //{
-        //    float fix = _currentDegree - DEGREE_RANGE;
-        //    Quaternion rotation = Quaternion.AngleAxis(-fix, _arbitraryAxis.normalized);
-        //    _deltaPos = rotation * _deltaPos;
-        //    _currentDegree = DEGREE_RANGE;
- 
-        //}
-        //else if (_currentDegree <= -DEGREE_RANGE)
-        //{
-        //    float fix = _currentDegree + DEGREE_RANGE;
-        //    Quaternion rotation = Quaternion.AngleAxis(-fix, _arbitraryAxis.normalized);
-        //    _deltaPos = rotation * _deltaPos;
-        //    _currentDegree = -DEGREE_RANGE;
-        //}
-
+    public void MakeDefaultDelta()
+    {
+        float yDegree = Utils.GetYAngleBetweenVectors(_deltaPos, new Vector3(0.0f, 0, -2.5f));
+        _deltaPos = Utils.RotateYAxis(_deltaPos, yDegree *10f* Time.deltaTime);
+      
+        // Lerp 사용시 벡터의 전환이 이상하게 되는것 같다.
+        //_deltaPos = Vector3.Lerp(_deltaPos, Utils.RotateYAxis(_deltaPos, yDegree), 10f * Time.deltaTime);
     }
 
 }

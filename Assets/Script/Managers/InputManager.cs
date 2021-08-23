@@ -47,26 +47,33 @@ public class InputManager
                 _pressedTime = 0;
             }
 
+ 
+        }
+    }
+    public void OnLateUpdate()
+    {
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+        if (MousAction != null)
+        {
             if (Input.GetMouseButton(1))
             {
                 if (_pressedRight == false)
                 {
                     // 우클릭 한번 했을때.
                 }
-                    
                 MousAction.Invoke(Define.MousEvent.PressedRight);
                 _pressedRight = true;
             }
             else
             {
-                if(_pressedRight)
+                if (_pressedRight)
                 {
                     MousAction.Invoke(Define.MousEvent.PointerUpRight);
                 }
                 _pressedRight = false;
             }
         }
-       
     }
 
     public void Clear()

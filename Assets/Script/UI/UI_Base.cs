@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 
 public abstract class UI_Base : MonoBehaviour
 {
@@ -46,7 +47,7 @@ public abstract class UI_Base : MonoBehaviour
         return objects[idx] as T;
 
     }
-
+    
     protected GameObject GetObject(int idx)
     {
         return Get<GameObject>(idx);
@@ -67,6 +68,10 @@ public abstract class UI_Base : MonoBehaviour
         return Get<Image>(idx);
     }
 
+    protected TextMeshProUGUI GetTextMeshProUGUI(int idx)
+    {
+        return Get<TextMeshProUGUI>(idx);
+    }
     // UI obejct 와 실행해야할 메소드 그리고   
     public static void AddUIEvent(GameObject go, Action<PointerEventData> action ,Define.UIEvent type = Define.UIEvent.Clicked)
     {

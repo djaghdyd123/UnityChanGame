@@ -18,8 +18,10 @@ public class MonsterGenerator : MonoBehaviour
     [SerializeField]
     float _spawnTime = 5.0f;
 
-
+    // 현재 몬스터 수
     public void AddMonsterCount(int value) { _monsterCount += value; }
+
+    // 현재 + 태어날 몬스터 최대 숫자.
     public void SetKeepMonsterCount(int count) { _keepMonsterCount = count; }
     void Start()
     {
@@ -38,6 +40,8 @@ public class MonsterGenerator : MonoBehaviour
 
     IEnumerator ReserveSpawn()
     {
+        //  reserveCount를 하지 않으면 _spwnTime이 지나서 spawn이 되기 전까 update가 불리는 횟수만큼 몬스터가 Generate됨.
+
         _reserveCount++;
         yield return new WaitForSeconds(Random.Range(0, _spawnTime));
         GameObject obj = Managers.Game.Spawn(Define.WorldObject.Monster, "Characters/SkeletonKing");

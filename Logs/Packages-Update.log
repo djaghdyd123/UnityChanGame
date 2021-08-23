@@ -59,3 +59,11 @@ The following packages were added:
   com.unity.postprocessing@2.1.7
   com.unity.purchasing@2.0.6
   com.unity.xr.legacyinputhelpers@2.0.2
+
+=== Tue Aug 17 22:43:17 2021
+
+Packages were changed.
+Update Mode: mergeDefaultDependencies
+
+The following packages were added:
+  com.unity.render-pipelines.lightweight@4.1.0-preview

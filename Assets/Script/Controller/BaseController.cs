@@ -41,6 +41,7 @@ public abstract class BaseController : MonoBehaviour
                 case Define.State.Run:
                     _anim.CrossFade("RUN", 0.1f);
                     break;
+
                 case Define.State.Run_B:
                     _anim.CrossFade("WALK00_B", 0.1f);
                     break;
@@ -77,6 +78,12 @@ public abstract class BaseController : MonoBehaviour
                 Run();
                 break;
             case Define.State.Run_L:
+                Run();
+                break;
+            case Define.State.Run_FL:
+                Run();
+                break;
+            case Define.State.Run_FR:
                 Run();
                 break;
             case Define.State.Die:

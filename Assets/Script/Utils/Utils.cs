@@ -59,4 +59,17 @@ public class Utils
         Vector3 newVector = new Vector3(vect.x * cos - vect.z * sin, vect.y, vect.z * cos + vect.x * sin);
         return newVector;
     }
+
+    public static float GetYAngleBetweenVectors(Vector3 a, Vector3 b)
+    {
+        float dotProduct = Vector3.Dot(new Vector3(a.x, 0, a.z), new Vector3(b.x, 0, b.z));
+        float  Mags= Vector3.Magnitude(new Vector3(a.x, 0, a.z)) * Vector3.Magnitude(new Vector3(b.x, 0, b.z));
+
+        if(a.x < 0)
+        return Mathf.Rad2Deg * Mathf.Acos(dotProduct / Mathf.Abs(Mags));
+        else
+            return -Mathf.Rad2Deg * Mathf.Acos(dotProduct / Mathf.Abs(Mags));
+
+
+    }
 } 

@@ -5,8 +5,11 @@ using UnityEngine.AI;
 
 public class PlayerController : BaseController
 {
-
+    [SerializeField]
+    float yDegree;
     protected PlayerStat _stat;
+
+    public GameObject cam = null;
 
     int _mask = (1 << (int)Define.layer.Monster | (1 << (int)Define.layer.Ground));
 
@@ -63,6 +66,14 @@ public class PlayerController : BaseController
                     _anim.CrossFade("RUN", 0.1f);
                     _stat.MoveSpeed = 5.0f;
                     break;
+                case Define.State.Run_FL:
+                    _anim.CrossFade("RUN", 0.1f);
+                    _stat.MoveSpeed = 3.5f;
+                    break;
+                case Define.State.Run_FR:
+                    _anim.CrossFade("RUN", 0.1f);
+                    _stat.MoveSpeed = 3.5f;
+                    break;
                 case Define.State.Run_B:
                     _anim.CrossFade("WALK00_B", 0.1f);
                     _stat.MoveSpeed = 2.0f;
@@ -78,34 +89,10 @@ public class PlayerController : BaseController
             }
         }
     }
-
-    #region
-    //GameObject (plaer)
-    // transform
-    // playerController (*)
-
-
-    // Local -> World
-    // transform.TransformDirection
-
-    //World -> Local
-
-    // transform.ReverseTransformDirection
-
-    // 절대값 회전 
-    // transform.eulerAngles = new Vector3(0.0f, 1.0f, 0.0f);
-
-    // 델타 회전
-    //  transform.Rotate(new Vector3(0.0f, Time.deltaTime * 100.0f, 0.0f)) ;
-
-    // quaternion 회전
-    // quaternion.LookRotation 은 월드좌표 기
-    #endregion
     [SerializeField]
     Vector3 dir;
     protected override void Run()
     {
-
             if (_lockTarget != null)
             {
                 _destPos = _lockTarget.transform.position;
@@ -120,59 +107,53 @@ public class PlayerController : BaseController
             //방향을 먼저 구하자
                 dir = _destPos - transform.position;
                 dir.y = 0;
-            //오차 범위 허용
-            if (dir.magnitude < 0.1f)
-            {
-                State = Define.State.Idle;
-            }
-            else
-            {
+        //오차 범위 허용
+        if (dir.magnitude < 0.1f)
+        {
+            State = Define.State.Idle;
+        }
+        else
+        {
 
-                if (Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1.0f, LayerMask.GetMask("Block")))
+            if (Physics.Raycast(transform.position + Vector3.up * 0.5f, dir, 1.0f, LayerMask.GetMask("Block")))
+            {
+                // 장애물 맞닥뜨릴때 더이상 transform x  마우스 때기전까지 계속 이동모션
+                if (Input.GetMouseButton(0) == false)
                 {
-                    // 장애물 맞닥뜨릴때 더이상 transform x  마우스 때기전까지 계속 이동모션
-                    if (Input.GetMouseButton(0) == false)
-                        State = Define.State.Idle;
+                    State = Define.State.Idle;
                     return;
                 }
-                float _moveDist = Mathf.Clamp(Time.deltaTime * _stat.MoveSpeed, 0, dir.magnitude);
-                transform.position += dir.normalized * _moveDist;
-                // 좌우뒤 이동은 방향 변환 x
-                if(State == Define.State.Run)
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 3.5f * Time.deltaTime);
             }
+            float _moveDist = Mathf.Clamp(Time.deltaTime * _stat.MoveSpeed, 0, dir.magnitude);
+            transform.position += dir.normalized * _moveDist;
+
+
+            // 목표지점을 기준으로 캐릭터 방향 회전
+            switch (State)
+            {
+                case Define.State.Run:
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 10f * Time.deltaTime);
+                    break;
+                case Define.State.Run_L:
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rotateVector(dir, 270)), 10f * Time.deltaTime);
+                    break;
+                case Define.State.Run_R:
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rotateVector(dir, 90)), 10f * Time.deltaTime);
+                    break;
+                case Define.State.Run_B:
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(-dir), 10f * Time.deltaTime);
+                    break;
+                case Define.State.Run_FL:
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rotateVector(dir, 315)), 10f * Time.deltaTime);
+                    break;
+                case Define.State.Run_FR:
+                    transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rotateVector(dir, 45)), 10f * Time.deltaTime);
+                    break;
+            }
+        }
         
            
  
-    }
-    private void OnCollisionEnter(Collision collision)
-    {
-        
-        if (collision.gameObject.layer == (int)Define.layer.Ground)
-        {
-            State = Define.State.Idle;
-            dir = Vector3.zero;
-        }
-        //if(collision.gameObject.layer == (int)Define.layer.Monster)
-        //{
-        //    Rigidbody rg = gameObject.GetComponent<Rigidbody>();
-        //    rg.isKinematic = true;
-        //}
-    }
-
-    float _jumpPower = 10.0f;
-    [SerializeField]
-    bool _isJumping = false;
-    protected override void Jump()
-    {
-
-        transform.position += dir.normalized * Time.deltaTime * _stat.MoveSpeed;
-        if (!_isJumping)
-            return;
-
-        Rigidbody rg = gameObject.GetComponent<Rigidbody>();
-        rg.AddForce(Vector3.up * _jumpPower, ForceMode.Impulse);
-        _isJumping = false;
     }
 
     protected override void Skill()
@@ -242,23 +223,30 @@ public class PlayerController : BaseController
 
             case Define.CameraMode.ShoulderView:
 
+                // 1.카메라방향을 기준으로 이동한다.
+                // 2.캐릭터회전은 이동지점을 기준으로 한다.
+                // 3.카메라위치는 캐릭터회전과 같은속도로 하여 2번을 offset. (바꾸지 않으면, 카메라 방향이 캐릭터 회전에 따라 계속 바뀌므로)
+                // 3-2. Y 축 회전만 위치를 보정.
+                // Error  Vector3.Slerp 에서 Y 회전이 조금씩 일어남.
                 if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
                 {
-                    if (_state != Define.State.Run)
+                    if (_state != Define.State.Run_FL)
                     {
-                        State = Define.State.Run;
+                        State = Define.State.Run_FL;
                     }
-                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 45);
-
+                    //1
+                    _destPos = transform.position + Utils.RotateYAxis(camDir(), 45);
+                    //3
+                    cam.GetComponent<CameraController>().MakeDefaultDelta();
                 }
                 else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
                 {
-                    if (_state != Define.State.Run)
+                    if (_state != Define.State.Run_FR)
                     {
-                        State = Define.State.Run;
+                        State = Define.State.Run_FR;
                     }
-                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 315);
-
+                    _destPos = transform.position + Utils.RotateYAxis(camDir(), 315);
+                    cam.GetComponent<CameraController>().MakeDefaultDelta();
                 }
                 else if (Input.GetKey(KeyCode.W))
                 {
@@ -266,7 +254,9 @@ public class PlayerController : BaseController
                     {
                         State = Define.State.Run;
                     }
-                    _destPos = transform.position + transform.forward;
+               
+                    _destPos = transform.position +  camDir();
+                    cam.GetComponent<CameraController>().MakeDefaultDelta();
 
                 }
                 else if (Input.GetKey(KeyCode.S))
@@ -275,7 +265,9 @@ public class PlayerController : BaseController
                     {
                         State = Define.State.Run_B;
                     }
-                    _destPos = transform.position - transform.forward;
+                    _destPos = transform.position -  camDir();
+
+                    cam.GetComponent<CameraController>().MakeDefaultDelta();
                 }
                 else if (Input.GetKey(KeyCode.A))
                 {
@@ -283,9 +275,9 @@ public class PlayerController : BaseController
                     {
                         State = Define.State.Run_L;
                     }
-                    Vector3 v = transform.forward;
 
-                    _destPos = transform.position + rotateVector(transform.forward, 90);
+                    _destPos = transform.position + rotateVector(camDir(), 90);
+                    cam.GetComponent<CameraController>().MakeDefaultDelta();
                 }
                 else if (Input.GetKey(KeyCode.D))
                 {
@@ -293,29 +285,15 @@ public class PlayerController : BaseController
                     {
                         State = Define.State.Run_R;
                     }
-                    Vector3 v = transform.forward;
-
-                    _destPos = transform.position + rotateVector(transform.forward, 270);
-
-                }
-                else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
-                {
-                    if (_state != Define.State.Run)
-                    {
-                        State = Define.State.Run;
-                    }
-                    _destPos = transform.position + Utils.RotateYAxis(transform.forward, 45);
-
+                    _destPos = transform.position + rotateVector(camDir(), 270);
+                    cam.GetComponent<CameraController>().MakeDefaultDelta();
                 }
                 else if (Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S) || Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D))
                 {
-                    //destPos 
                     State = Define.State.Idle;
                 }
                 break;
-               
-        }
-        
+        }  
     }
 
     Vector3 rotateVector(Vector3 vect, float deg)
@@ -326,8 +304,13 @@ public class PlayerController : BaseController
         Vector3 newVector = new Vector3(vect.x * cos - vect.z * sin, vect.y, vect.z * cos + vect.x * sin);
         return newVector;
     }
-    bool _stopSkill = false;
 
+    Vector3 camDir()
+    {
+        return (gameObject.transform.position-cam.transform.position).normalized;
+    }
+
+    bool _stopSkill = false;
     void OnMouseEvent(Define.MousEvent evt)
     {
         switch(State)
@@ -346,7 +329,6 @@ public class PlayerController : BaseController
                 break;
         }
     }
-
 
     void onMouseEvent_IdleRun(Define.MousEvent evt)
     {
@@ -426,8 +408,7 @@ public class PlayerController : BaseController
                 _stopSkill = true;
                 break;
             case Define.MousEvent.PointerDownRight:
-                State = Define.State.Jump;
-                _isJumping = true;
+
                 break;
         }
             //lastTick = currentTick;

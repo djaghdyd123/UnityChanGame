@@ -43,9 +43,13 @@ public class Managers : MonoBehaviour
         _input.OnUpdate();
     }
 
+    void LateUpdate()
+    {
+        _input.OnLateUpdate();
+    }
 
 
-   static void Init()
+    static void Init()
     {
         if(s_instance == null)
         {

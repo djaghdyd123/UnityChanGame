@@ -5991,6 +5991,7 @@ GameObject:
   - component: {fileID: 8294237931074644399}
   - component: {fileID: 8664354975900692668}
   - component: {fileID: 5307827698306720416}
+  - component: {fileID: 9122696780525876992}
   m_Layer: 0
   m_Name: UnityChan
   m_TagString: Player
@@ -6005,7 +6006,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8113881554284801538}
-  m_LocalRotation: {x: -0, y: 0.9270306, z: -0, w: 0.37498572}
+  m_LocalRotation: {x: 0, y: 0.92703015, z: 0, w: 0.3749869}
   m_LocalPosition: {x: -1.87, y: 0.09, z: -21.22}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -6078,8 +6079,9 @@ MonoBehaviour:
   _destPos: {x: 0, y: 0, z: 0}
   _state: 1
   _lockTarget: {fileID: 0}
+  yDegree: 0
+  cam: {fileID: 0}
   dir: {x: 0, y: 0, z: 0}
-  _isJumping: 0
 --- !u!114 &8664354975900692668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6114,6 +6116,19 @@ MonoBehaviour:
   _jumpPower: 0
   _gold: 0
   _exp: 0
+--- !u!114 &9122696780525876992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8113881554284801538}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5844996f423cf47c799bce28f552afe4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactionDistance: 1
 --- !u!1 &8126195286572108280
 GameObject:
   m_ObjectHideFlags: 0

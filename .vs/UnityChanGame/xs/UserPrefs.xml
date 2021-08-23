@@ -1,26 +1,46 @@
 ﻿<Properties StartupConfiguration="{2AED522A-DA17-52F5-A728-0EEA986D2E3B}|">
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Script/Controller/CameraController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Script/Controller/ShoulderView2 Controller/Shoulderview2Controller.cs">
     <Files>
-      <File FileName="Assets/Script/Controller/CameraController.cs" Line="150" Column="12" />
-      <File FileName="Assets/Script/Controller/PlayerController.cs" Line="416" Column="26" />
-      <File FileName="Assets/Script/Scenes/GameScene.cs" />
-      <File FileName="Assets/Script/Managers/InputManager.cs" />
-      <File FileName="Assets/Script/Utils/Define.cs" />
-      <File FileName="Assets/Script/Controller/MonsterController.cs" />
+      <File FileName="Assets/Script/Controller/CameraController.cs" Line="100" Column="9" />
+      <File FileName="Assets/Script/Controller/PlayerController.cs" />
+      <File FileName="Assets/Script/Managers/InputManager.cs" Line="57" Column="32" />
+      <File FileName="Assets/Script/UI/Popup/UI_Description.cs" />
+      <File FileName="Assets/Script/UI/Popup/UI_Button.cs" />
+      <File FileName="Assets/Script/UI/UI_Base.cs" />
+      <File FileName="Assets/Script/Managers/UIManagers.cs" />
       <File FileName="Assets/Script/Controller/BaseController.cs" />
+      <File FileName="Assets/Script/Utils/Define.cs" />
+      <File FileName="Assets/Script/Data/Data.Contents.cs" />
+      <File FileName="Assets/Script/Contents/PlayerStat.cs" />
       <File FileName="Assets/Script/Utils/Utils.cs" />
+      <File FileName="Assets/Script/Managers/Managers.cs" />
+      <File FileName="Assets/Script/Scenes/GameScene2.cs" Line="22" Column="10" />
+      <File FileName="Assets/Script/Interaction/PlayerInteraction.cs" />
+      <File FileName="Assets/Script/Interaction/Interactable Object/Door.cs" />
+      <File FileName="Assets/Script/Managers/Contents/GameManagerEX.cs" />
+      <File FileName="Assets/Script/Scenes/GameScene.cs" />
+      <File FileName="Assets/Script/Managers/SoundManager.cs" />
+      <File FileName="Assets/Script/Managers/SceneManagerEX.cs" />
+      <File FileName="Assets/Script/Controller/CursorController.cs" />
+      <File FileName="Assets/Script/Controller/FirstPerson/FirstPersonController.cs" Line="227" Column="1" />
+      <File FileName="Assets/Script/Controller/ShoulderView2 Controller/Shoulderview2Controller.cs" Line="121" Column="53" />
+      <File FileName="Assets/Script/Controller/ThirdPerson/ThirdPersonCharacter.cs" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="UnityChanGame" expanded="True">
             <Node name="Assets" expanded="True">
-              <Node name="Scenes" expanded="True" />
               <Node name="Script" expanded="True">
                 <Node name="Controller" expanded="True">
-                  <Node name="CameraController.cs" selected="True" />
+                  <Node name="FirstPerson" expanded="True" />
+                  <Node name="ShoulderView2 Controller" expanded="True">
+                    <Node name="Shoulderview2Controller.cs" selected="True" />
+                  </Node>
+                  <Node name="ThirdPerson" expanded="True" />
                 </Node>
                 <Node name="Managers" expanded="True" />
+                <Node name="Scenes" expanded="True" />
                 <Node name="Utils" expanded="True" />
               </Node>
             </Node>
@@ -31,7 +51,7 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="011c50d5-0489-44aa-8fd8-456cb1eaf4b5" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="2db3e66d-3414-435d-97d4-2d83b2b1c5c0" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
